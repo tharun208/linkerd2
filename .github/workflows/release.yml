@@ -95,6 +95,7 @@ jobs:
       shell: bash
       run: |
         echo ::set-env name=TAG::$(CI_FORCE_CLEAN=1 bin/root-tag)
+        echo $TAG
     - name: Install linkerd CLI
       id: install_cli
       run: |
