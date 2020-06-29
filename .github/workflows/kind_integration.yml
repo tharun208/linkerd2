@@ -89,9 +89,18 @@ jobs:
       uses: actions/download-artifact@18f0f59
       with:
         name: image-archives
-    - name: Install CLI
+    - name: Run bin/root-tag
+      shell: bash
       run: |
-        cp image-archives\cli\windows\linkerd $HOME\linkerd.exe
+        echo ::set-env name=TAG::$(CI_FORCE_CLEAN=1 bin/root-tag)
+    - name: Install linkerd CLI
+      id: install_cli
+      run: |
+        $image="gcr.io/linkerd-io/cli-bin:$TAG"
+        echo $TAG
+        docker pull $image
+        $id = (docker create $image)
+        docker cp "${id}:/out/linkerd-windows" "$HOME\linkerd.exe"
     - name: Run CLI Integration tests
       run: |
         go test --failfast --mod=readonly ".\test\cli" --linkerd=$HOME\linkerd.exe --cli-tests -v
